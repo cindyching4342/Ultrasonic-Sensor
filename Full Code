@@ -1,0 +1,65 @@
+int trigPin = 8;      // trig pin of HC-SR04
+int echoPin = 9;     // Echo pin of HC-SR04
+
+// Motor pins
+const int ENA = 5;
+const int ENB = 6;
+const int IN1 = 10;
+const int IN2 = 11;
+const int IN3 = 12;
+const int IN4 = 13;
+long duration, distance;
+
+void setup() {
+  delay(random(500, 2000));   // delay for random time
+
+  Serial.begin(9600);
+
+  pinMode(IN1, OUTPUT);      // set Motor pins as output
+  pinMode(IN2, OUTPUT);
+  pinMode(IN3, OUTPUT);
+  pinMode(IN4, OUTPUT);
+  pinMode(ENA, OUTPUT);
+  pinMode(ENB, OUTPUT);
+
+  pinMode(trigPin, OUTPUT);         // set trig pin as output
+  pinMode(echoPin, INPUT);          // set echo pin as input to capture reflected waves
+}
+
+void forward() {
+  analogWrite(ENA, 200);
+  analogWrite(ENB, 200);
+  digitalWrite(IN1, HIGH);
+  digitalWrite(IN2, LOW);
+  digitalWrite(IN3, LOW);
+  digitalWrite(IN4, HIGH);
+}
+
+void stop() {
+  analogWrite(ENA, 0);
+  analogWrite(ENB, 0);
+}
+
+void loop() {
+  digitalWrite(trigPin, LOW);
+  delayMicroseconds(2);
+
+  digitalWrite(trigPin, HIGH);     // send waves for 10 us
+  delayMicroseconds(10);
+  digitalWrite(trigPin, LOW);
+
+  duration = pulseIn(echoPin, HIGH); // receive reflected waves
+  distance = duration / 58.2;        // convert to distance
+
+  Serial.print("Distance: ");        // print distance data
+  Serial.print(distance);
+  Serial.println(" cm");
+
+  delay(10);
+
+  if (distance > 19) {            
+    forward();
+  } else if (distance < 18) {
+    stop();
+  }
+}
